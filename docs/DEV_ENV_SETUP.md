@@ -25,7 +25,7 @@
 
 ## Initial template setup
 
-This section documents the commands use to initially set up the repository.
+This section documents the commands used to initially set up the project repository.
 
 1. Install cargo-generate: `cargo install cargo-generate`
 2. Create the template: `cargo generate rp-rs/rp2040-project-template`
