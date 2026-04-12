@@ -13,7 +13,13 @@
 3. Install the cross-compilation toolchain: `rustup target install thumbv6m-none-eabi`
 4. Install stack overflow protection: `cargo install flip-link`
 5. Install the flashing tools: `cargo install --locked probe-rs-tools`
-6. Install debugger for probe-rs via the VSCode extensions menu (View > Extensions)
+6. (Optional) Install debugger for probe-rs via the VSCode extensions menu (View > Extensions)
+7. Set up probe.rs per https://probe.rs/docs/getting-started/probe-setup/:
+    [ ] Copy Udev Rules to device: `sudo cp files/69-probe-rs.rules  /etc/udev/rules.d/`
+    [ ] `sudo udevadm control --reload`
+    [ ] `sudo udevadm trigger`
+    [ ] `sudo groupadd --system plugdev`
+    [ ] `sudo usermod -a -G plugdev $USER`
 
 ## Initial template setup:
 
