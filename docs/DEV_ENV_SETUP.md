@@ -14,14 +14,15 @@
 4. Install stack overflow protection: `cargo install flip-link`
 5. Install the flashing tools: `cargo install --locked probe-rs-tools`
 6. (Optional) Install debugger for probe-rs via the VSCode extensions menu (View > Extensions)
-7. Set up probe.rs per https://probe.rs/docs/getting-started/probe-setup/:
-    [ ] Copy Udev Rules to device: `sudo cp files/69-probe-rs.rules  /etc/udev/rules.d/`
-    [ ] `sudo udevadm control --reload`
-    [ ] `sudo udevadm trigger`
-    [ ] `sudo groupadd --system plugdev`
-    [ ] `sudo usermod -a -G plugdev $USER`
+7. Set up probe.rs per <https://probe.rs/docs/getting-started/probe-setup/>:
 
-## Initial template setup:
+    - Copy Udev Rules to device: `sudo cp files/69-probe-rs.rules  /etc/udev/rules.d/`
+    - `sudo udevadm control --reload`
+    - `sudo udevadm trigger`
+    - `sudo groupadd --system plugdev`
+    - `sudo usermod -a -G plugdev $USER`
+
+## Initial template setup
 
 This section documents the commands use to initially set up the repository.
 
@@ -33,6 +34,6 @@ This section documents the commands use to initially set up the repository.
 4. Install stack overflow protection: `cargo install flip-link`
 5. Install the flashing tools: `cargo install --locked probe-rs-tools`
 
-## Resources:
+## Resources
 
-1. Project template: https://github.com/rp-rs/rp2040-project-template
+1. Project template: <https://github.com/rp-rs/rp2040-project-template>
