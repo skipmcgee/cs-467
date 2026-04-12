@@ -5,11 +5,12 @@
 1. Install OpenSSL: `sudo apt install openssl`
 2. Install OpenSSL Development Tools: `sudo apt install libssl-dev`
 3. Install VSCode
+4. Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
 
 ## How to set up the Development Environment
 
-1. Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-2. Clone the Repo: ` git clone git@github.com:skipmcgee/cs-467.git`
+1. Clone the Repo: `git clone git@github.com:skipmcgee/cs-467.git`
+2. Install clippy: `cargo install clippy`
 3. Install the cross-compilation toolchain: `rustup target install thumbv6m-none-eabi`
 4. Install stack overflow protection: `cargo install flip-link`
 5. Install the flashing tools: `cargo install --locked probe-rs-tools`
