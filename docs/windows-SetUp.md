@@ -8,7 +8,7 @@
    
 3.	Install Rust: Visit https://rustup.rs and download/install via the Windows Installer (rustup-init.exe) - https://rust-lang.org/tools/install/
    
-4.	As a note, OpenSSL is not required for building/flashing firmware for Windows setup (as referenced in `DEV_ENV_SETUP.md` and `macOSSetup.md`) as Windows uses its own built-in SSL libraries.
+    - As a note: OpenSSL is not required for building/flashing firmware for Windows setup (as referenced in `DEV_ENV_SETUP.md` and `macOSSetup.md`) as Windows uses its own built-in SSL libraries.
 
 ## Setting up the Development Environment:
 
