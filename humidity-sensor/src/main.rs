@@ -3,6 +3,7 @@
 //! This project uses readings from a DHT20 Temperature and Humidity sensor.
 //! It displays the humidity levels via an LED array and an LCD screen.
 //! Adapted code from: https://rust-classes.com/chapter_embedded_pi_input_dht20
+//! This project structure was generated with a template from: https://github.com/rp-rs/rp2040-project-template
 #![no_std]
 #![no_main]
 mod sensor;

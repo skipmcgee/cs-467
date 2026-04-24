@@ -20,3 +20,4 @@ Sources and References:
 
 - DHT20 Sensor / Pico Setup: https://rust-classes.com/chapter_embedded_pi_input_dht20
 - DHT20 sensor datasheet: https://cdn.sparkfun.com/assets/8/a/1/5/0/DHT20.pdf
+- Template Generation: https://github.com/rp-rs/rp2040-project-template
