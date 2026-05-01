@@ -7,17 +7,21 @@
 #![no_std]
 #![no_main]
 mod sensor;
+mod leds;
+
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_rp::{
     bind_interrupts,
+    gpio::{Level, Output},
     i2c::{self, Config, InterruptHandler},
     peripherals::I2C1,
 };
 use embassy_time::Timer;
 use panic_probe as _;
 use sensor::{initialize, read_temperature_and_humidity};
+use leds::update_leds;
 use {defmt_rtt as _, panic_probe as _};
 //use embedded_hal::digital::OutputPin;
 // Provide an alias for our BSP so we can switch targets quickly.
@@ -53,6 +57,14 @@ async fn main(_spawner: Spawner) -> ! {
     info!("Starting to set up i2c");
     let mut i2c = i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, Config::default());
 
+    // led set up
+    let mut led1 = Output::new(p.PIN_10, Level::Low);
+    let mut led2 = Output::new(p.PIN_11, Level::Low);
+    let mut led3 = Output::new(p.PIN_12, Level::Low);
+    let mut led4 = Output::new(p.PIN_13, Level::Low);
+    let mut led5 = Output::new(p.PIN_14, Level::Low);
+    let mut led6 = Output::new(p.PIN_15, Level::Low);
+    
     // initialize variable to determine how often to get the sensor readings
     let reading_interval_milliseconds = 500;
 
@@ -115,6 +127,7 @@ async fn main(_spawner: Spawner) -> ! {
         // output the readings to the console
         info!("Temperature: {}C, Humidity: {}%", temperature, humidity);
 
+        update_leds(humidity, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
         // delay a period of time before the next reading
         Timer::after_millis(reading_interval_milliseconds).await;
     }
