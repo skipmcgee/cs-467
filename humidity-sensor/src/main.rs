@@ -57,7 +57,7 @@ async fn main(_spawner: Spawner) -> ! {
     info!("Starting to set up i2c");
     let mut i2c = i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, Config::default());
 
-    // led set up
+    // led set up - will initialize to off until the first reading is received.
     let mut led1 = Output::new(p.PIN_10, Level::Low);
     let mut led2 = Output::new(p.PIN_11, Level::Low);
     let mut led3 = Output::new(p.PIN_12, Level::Low);
