@@ -18,11 +18,11 @@ pub async fn initialize(i2c: &mut I2c<'static, I2C1, Async>) -> bool {
     // per the data sheet: "After power-on, wait no less than 100ms"
     Timer::after_millis(100).await;
 
-    // per the data dheet: " Before reading the temperature and humidity value, get a byte of statusword by sending 0x71"
+    // per the data sheet: " Before reading the temperature and humidity value, get a byte of statusword by sending 0x71"
     let mut data = [0x0; 1];
     i2c.write_read(DHT20_I2C_ADDR, &[DHT20_GET_STATUS], &mut data)
         .await
-        .expect("Can not read status");
+        .expect("Can not read sensor status");
 
     // Per the data sheet: "If the status word and 0x18 are not equal to 0x18, initialize the 0x1B, 0x1C,
     // 0x1E registers, details Please refer to our official website routine for the initialization process;
@@ -40,7 +40,7 @@ async fn read_data(i2c: &mut I2c<'static, I2C1, Async>) -> [u8; 6] {
     for _ in 0..10 {
         i2c.write(DHT20_I2C_ADDR, &DHT20_READ_DATA)
             .await
-            .expect("Can not write data");
+            .expect("Can not write data to sensor");
         Timer::after_millis(80).await;
 
         i2c.read(DHT20_I2C_ADDR, &mut data)

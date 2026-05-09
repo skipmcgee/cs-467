@@ -1,4 +1,4 @@
-# Development Environment Directions
+# LINUX Development Environment Directions
 
 ## Prerequisites
 
@@ -31,9 +31,6 @@ This section documents the commands used to initially set up the project reposit
 2. Create the template: `cargo generate rp-rs/rp2040-project-template`
     - Name: `humidity-sensor`
     - Flashing method: `probe.rs`
-3. Install the cross-compilation toolchain: `rustup target install thumbv6m-none-eabi`
-4. Install stack overflow protection: `cargo install flip-link`
-5. Install the flashing tools: `cargo install --locked probe-rs-tools`
 
 ## Resources
 

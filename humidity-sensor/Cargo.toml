@@ -30,6 +30,9 @@ embassy-time = { git = "https://github.com/embassy-rs/embassy", features = ["def
 embassy-rp = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl"] }
 dht20 = "0.1.0"
 embedded-hal-async = "1.0.0"
+hd44780-driver = "0.4.0"
+heapless = "0.9.3"
+ufmt = "0.2.0"
 
 # cargo build/run
 [profile.dev]
