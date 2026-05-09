@@ -50,7 +50,6 @@ async fn main(_spawner: Spawner) -> ! {
     info!("Starting to set up LCD i2c");
     let mut lcd_i2c_config = Config::default();
     lcd_i2c_config.frequency = 100_000;
-    //let lcd_i2c = i2c::I2c::new_async(p.I2C0, lcd_scl, lcd_sda, Irqs, Config::default());
     let lcd_i2c = i2c::I2c::new_async(p.I2C0, lcd_scl, lcd_sda, Irqs, lcd_i2c_config);
 
     // initialize variable to determine how often to get the sensor readings
@@ -60,10 +59,9 @@ async fn main(_spawner: Spawner) -> ! {
     let ready = initialize(&mut i2c).await;
     info!("Sensor Readiness: {}", ready);
 
-    // set up lcd screen
+    // set up LCD screen
     let mut lcd =
         HD44780::new_i2c(lcd_i2c, 0x27, &mut Delay).expect("Failed to initialize LCD Screen");
-
     lcd.reset(&mut Delay).expect("LCD Screen Reset Failed!");
     lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
 
@@ -76,7 +74,7 @@ async fn main(_spawner: Spawner) -> ! {
         // output the readings to the console
         info!("Temperature: {}C, Humidity: {}%", temperature, humidity);
 
-        // string conversion
+        // f32 to string conversions
         let mut humidity_string = String::<16>::new();
         let _ = core::write!(&mut humidity_string, "{}C", humidity);
         let mut temperature_string = String::<16>::new();
@@ -85,16 +83,14 @@ async fn main(_spawner: Spawner) -> ! {
         debug!("Temperature String: {}", temperature_string.as_str());
 
         // LCD commands
-        //lcd.reset(&mut Delay).expect("LCD Screen Reset Failed!");
-        Timer::after_millis(500).await;
-        //lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
-        Timer::after_millis(500).await;
+        lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
+        Timer::after_millis(1000).await;
         match lcd.write_str(&humidity_string, &mut Delay) {
             Ok(_) => debug!("Success writing to LCD Screen"),
             Err(_) => info!("Error writing humidity value to LCD screen"),
         }
 
-        // delay a period of time before the next reading
+        // delay a period of time before the next reading / loop
         Timer::after_millis(reading_interval_milliseconds).await;
     }
 }
