@@ -35,7 +35,7 @@ pub fn calc_colors(humidity: f32) -> [RGB8; NUM_LEDS] {
 }
 
 pub async fn update_strip(
-  ws2812: &mut PioWs2812<'static, PIO0, 0, NUM_LEDS>,
+  ws2812: &mut PioWs2812<'static, PIO0, 0, NUM_LEDS, embassy_rp::pio_programs::ws2812::Grb>,
   humidity: f32,
   ) {
   let colors = calc_colors(humidity);
