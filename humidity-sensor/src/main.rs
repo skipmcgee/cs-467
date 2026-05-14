@@ -8,6 +8,7 @@
 #![no_main]
 mod sensor;
 mod leds;
+mod led_strip;
 
 use defmt::*;
 use defmt_rtt as _;
@@ -22,6 +23,13 @@ use embassy_time::Timer;
 use panic_probe as _;
 use sensor::{initialize, read_temperature_and_humidity};
 use leds::update_leds;
+
+use embassy_rp::peripherals::{DMA_CH0, PIO0};
+use embassy_rp::pio::{InterruptHandler as PioInterruptHandler, Pio};
+use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
+use led_strip::update_strip;
+
+    
 use {defmt_rtt as _, panic_probe as _};
 //use embedded_hal::digital::OutputPin;
 // Provide an alias for our BSP so we can switch targets quickly.
@@ -37,6 +45,8 @@ use {defmt_rtt as _, panic_probe as _};
 
 bind_interrupts!(struct Irqs {
     I2C1_IRQ => InterruptHandler<I2C1>;
+    PIO0_IRQ_0 => PioInterruptHandler<PIO0>;
+    DMA_IRQ_0 => embassy_rp::dma::InterruptHandler<DMA_CH0>;
 });
 
 #[embassy_executor::main]
@@ -64,6 +74,12 @@ async fn main(_spawner: Spawner) -> ! {
     let mut led4 = Output::new(p.PIN_13, Level::Low);
     let mut led5 = Output::new(p.PIN_14, Level::Low);
     let mut led6 = Output::new(p.PIN_15, Level::Low);
+
+    // led STRIP set up
+    let Pio {mut common, sm0, ..} = Pio::new(p.PIO0, Irqs);
+    let program = PioWs2812Program::new(&mut common);
+    let mut ws2812 = PioWs2812::new(&mut common, sm0, p.DMA_CH0, Irqs, p.PIN_16, &program);
+
     
     // initialize variable to determine how often to get the sensor readings
     let reading_interval_milliseconds = 500;
@@ -128,6 +144,10 @@ async fn main(_spawner: Spawner) -> ! {
         info!("Temperature: {}C, Humidity: {}%", temperature, humidity);
 
         update_leds(humidity, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+
+        // updates the WS2812 strip based on the reading
+        update_strip(&mut ws2812, humidity).await;
+        
         // delay a period of time before the next reading
         Timer::after_millis(reading_interval_milliseconds).await;
     }
