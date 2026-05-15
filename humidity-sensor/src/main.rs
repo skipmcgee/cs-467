@@ -127,6 +127,7 @@ async fn main(_spawner: Spawner) -> ! {
 
     // this is the main program loop
     // consider adding exit criteria to break out when disconnected, etc?
+    /*
     loop {
         //commented out the example program
         /*
@@ -151,4 +152,49 @@ async fn main(_spawner: Spawner) -> ! {
         // delay a period of time before the next reading
         Timer::after_millis(reading_interval_milliseconds).await;
     }
+    */
+
+    // Integrated testing for each individual LED, it will cycle through and every 3 seconds should light up the next one starting with no LEDs lit.
+    // Each LED represents 10% so it goes up by 10 on each threshold.
+    loop {
+        info!("Testing 0.0% - Should show 0 LEDs");
+        update_strip(&mut ws2812, 0.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 10.0% - Should show 1 Green LED");
+        update_strip(&mut ws2812, 10.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 20.0% - Should show 2 Green LEDs");
+        update_strip(&mut ws2812, 20.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 30.0% - Should show 2 Green and 1 Yellow LEDs");
+        update_strip(&mut ws2812, 30.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 40.0% - Should show 2 Green and 2 Yellow LEDs");
+        update_strip(&mut ws2812, 40.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 50.0% - Should show 2 Green, 2 Yellow, and 1 OJ LEDs");
+        update_strip(&mut ws2812, 50.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 60.0% - Should show 2 Green, 2 Yellow, and 2 OJ LEDs");
+        update_strip(&mut ws2812, 60.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 70.0% - Should show 2 Green, 2 Yellow, 2 OJ , and 1 Red LEDs");
+        update_strip(&mut ws2812, 70.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 80.0% - Should show 2 Green, 2 Yellow, 2 OJ , and 2 Red LEDs");
+        update_strip(&mut ws2812, 80.0).await;
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 100.0% - Should show ALL LEDs");
+        update_strip(&mut ws2812, 100.0).await;
+        Timer::after_millis(3000).await;    
+    }    
 }
