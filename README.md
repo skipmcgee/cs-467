@@ -64,3 +64,4 @@ https://a.co/d/07D1i1G4
 - LCD Screen Setup: https://pico.implrust.com/lcd-display/hello-rust.html
 - DHT20 sensor datasheet: https://cdn.sparkfun.com/assets/8/a/1/5/0/DHT20.pdf
 - Template Generation: https://github.com/rp-rs/rp2040-project-template
+- DHT20 Specs: https://cdn-shop.adafruit.com/product-files/5183/5193_DHT20.pdf
