@@ -22,7 +22,6 @@ rp-pico = "0.9.0"
 # If you're not going to use a Board Support Package you'll need these:
 # rp2040-hal = { version="0.10", features=["rt", "critical-section-impl", "rp2040" ] }
 # rp2040-boot2 = "0.3"
-
 embassy-embedded-hal = { git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
 embassy-sync = { git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
 embassy-executor = { version = "0.10.0", git = "https://github.com/embassy-rs/embassy", features = ["platform-cortex-m", "executor-thread", "executor-interrupt", "defmt", "embassy-time-driver"] }
@@ -30,6 +29,9 @@ embassy-time = { git = "https://github.com/embassy-rs/embassy", features = ["def
 embassy-rp = { git = "https://github.com/embassy-rs/embassy", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl"] }
 dht20 = "0.1.0"
 embedded-hal-async = "1.0.0"
+hd44780-driver = "0.4.0"
+heapless = "0.9.3"
+ufmt = "0.2.0"
 
 # cargo build/run
 [profile.dev]

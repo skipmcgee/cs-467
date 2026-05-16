@@ -3,119 +3,94 @@
 //! This project uses readings from a DHT20 Temperature and Humidity sensor.
 //! It displays the humidity levels via an LED array and an LCD screen.
 //! Adapted code from: https://rust-classes.com/chapter_embedded_pi_input_dht20
+//! Adapted code from https://pico.implrust.com/lcd-display/hello-rust.html
 //! This project structure was generated with a template from: https://github.com/rp-rs/rp2040-project-template
 #![no_std]
 #![no_main]
-mod sensor;
+use core::fmt::Write;
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_rp::{
     bind_interrupts,
     i2c::{self, Config, InterruptHandler},
-    peripherals::I2C1,
+    peripherals::{I2C0, I2C1},
 };
+use embassy_time::Delay;
 use embassy_time::Timer;
+use hd44780_driver::HD44780;
+use heapless::String;
 use panic_probe as _;
-use sensor::{initialize, read_temperature_and_humidity};
 use {defmt_rtt as _, panic_probe as _};
-//use embedded_hal::digital::OutputPin;
-// Provide an alias for our BSP so we can switch targets quickly.
-// Uncomment the BSP you included in Cargo.toml, the rest of the code does not need to change.
-//use rp_pico as bsp;
-// use sparkfun_pro_micro_rp2040 as bsp;
-//use bsp::hal::{
-//    clocks::{init_clocks_and_plls, Clock},
-//    pac,
-//    sio::Sio,
-//    watchdog::Watchdog,
-//};
+
+// local imports
+mod sensor;
+use sensor::{initialize, read_temperature_and_humidity};
 
 bind_interrupts!(struct Irqs {
     I2C1_IRQ => InterruptHandler<I2C1>;
+    I2C0_IRQ => InterruptHandler<I2C0>;
 });
 
 #[embassy_executor::main]
 //#[entry]
 async fn main(_spawner: Spawner) -> ! {
     info!("Starting the humidity_sensor project program");
-    // commented out the items from the starting blinky light test
-    /*let mut pac = pac::Peripherals::take().unwrap();
-    let core = pac::CorePeripherals::take().unwrap();
-    let mut watchdog = Watchdog::new(pac.WATCHDOG);
-    let sio = Sio::new(pac.SIO);
-    */
 
     // sensor setup
-    let p = embassy_rp::init(Default::default());
-    let sda = p.PIN_2;
-    let scl = p.PIN_3;
-    info!("Starting to set up i2c");
+    let p: embassy_rp::Peripherals = embassy_rp::init(Default::default());
+    let sda: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_2> = p.PIN_2;
+    let scl: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_3> = p.PIN_3;
+    let lcd_sda: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_16> = p.PIN_16;
+    let lcd_scl: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_17> = p.PIN_17;
+
+    info!("Starting to set up sensor i2c");
     let mut i2c = i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, Config::default());
 
+    info!("Starting to set up LCD i2c");
+    let mut lcd_i2c_config = Config::default();
+    lcd_i2c_config.frequency = 100_000;
+    let lcd_i2c = i2c::I2c::new_async(p.I2C0, lcd_scl, lcd_sda, Irqs, lcd_i2c_config);
+
     // initialize variable to determine how often to get the sensor readings
-    let reading_interval_milliseconds = 500;
+    let reading_interval_milliseconds: u64 = 1000;
 
     // check if the sensor is ready
     let ready = initialize(&mut i2c).await;
     info!("Sensor Readiness: {}", ready);
 
-    // commented out the items from the blinky light setup template
-    /*
-    // External high-speed crystal on the pico board is 12Mhz
-    let external_xtal_freq_hz = 12_000_000u32;
-    let clocks = init_clocks_and_plls(
-        external_xtal_freq_hz,
-        pac.XOSC,
-        pac.CLOCKS,
-        pac.PLL_SYS,
-        pac.PLL_USB,
-        &mut pac.RESETS,
-        &mut watchdog,
-    )
-    .ok()
-    .unwrap();
-
-    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
-
-    let pins = bsp::Pins::new(
-        pac.IO_BANK0,
-        pac.PADS_BANK0,
-        sio.gpio_bank0,
-        &mut pac.RESETS,
-    );
-
-    // This is the correct pin on the Raspberry Pico board. On other boards, even if they have an
-    // on-board LED, it might need to be changed.
-    //
-    // Notably, on the Pico W, the LED is not connected to any of the RP2040 GPIOs but to the cyw43 module instead.
-    // One way to do that is by using [embassy](https://github.com/embassy-rs/embassy/blob/main/examples/rp/src/bin/wifi_blinky.rs)
-    //
-    // If you have a Pico W and want to toggle a LED with a simple GPIO output pin, you can connect an external
-    // LED to one of the GPIO pins, and reference that pin here. Don't forget adding an appropriate resistor
-    // in series with the LED.
-    let mut led_pin = pins.led.into_push_pull_output();
-    */
+    // set up LCD screen
+    let mut lcd =
+        HD44780::new_i2c(lcd_i2c, 0x27, &mut Delay).expect("Failed to initialize LCD Screen");
+    lcd.reset(&mut Delay).expect("LCD Screen Reset Failed!");
+    lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
 
     // this is the main program loop
     // consider adding exit criteria to break out when disconnected, etc?
     loop {
-        //commented out the example program
-        /*
-        //info!("on!");
-        //led_pin.set_high().unwrap();
-        //delay.delay_ms(500);
-        //info!("off!");
-        //led_pin.set_low().unwrap();
-         */
-
         // get the temp and humidity readings from the sensor
         let (temperature, humidity) = read_temperature_and_humidity(&mut i2c).await;
 
         // output the readings to the console
         info!("Temperature: {}C, Humidity: {}%", temperature, humidity);
 
-        // delay a period of time before the next reading
+        // f32 to string conversions
+        let mut humidity_string = String::<16>::new();
+        let _ = core::write!(&mut humidity_string, "{}C", humidity);
+        let mut temperature_string = String::<16>::new();
+        let _ = core::write!(&mut temperature_string, "{}C", temperature);
+        debug!("Humidity String: {}", humidity_string.as_str());
+        debug!("Temperature String: {}", temperature_string.as_str());
+
+        // LCD commands
+        lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
+        Timer::after_millis(1000).await;
+        match lcd.write_str(&humidity_string, &mut Delay) {
+            Ok(_) => debug!("Success writing to LCD Screen"),
+            Err(_) => info!("Error writing humidity value to LCD screen"),
+        }
+
+        // delay a period of time before the next reading / loop
         Timer::after_millis(reading_interval_milliseconds).await;
     }
 }
