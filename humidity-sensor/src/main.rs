@@ -5,8 +5,12 @@
 //! Adapted code from: https://rust-classes.com/chapter_embedded_pi_input_dht20
 //! Adapted code from https://pico.implrust.com/lcd-display/hello-rust.html
 //! This project structure was generated with a template from: https://github.com/rp-rs/rp2040-project-template
+
+// Disable standard library and fn main() since we're working with an embedded system
 #![no_std]
 #![no_main]
+
+//Import necessary libraries and macros
 use core::fmt::Write;
 use defmt::*;
 use defmt_rtt as _;
@@ -23,7 +27,7 @@ use heapless::String;
 use panic_probe as _;
 use {defmt_rtt as _, panic_probe as _};
 
-// local imports
+// Local imports
 mod sensor;
 use sensor::{initialize, read_temperature_and_humidity};
 
@@ -32,15 +36,21 @@ bind_interrupts!(struct Irqs {
     I2C0_IRQ => InterruptHandler<I2C0>;
 });
 
+// Indicates entry point into the program since fn main() is disabled
 #[embassy_executor::main]
 //#[entry]
 async fn main(_spawner: Spawner) -> ! {
     info!("Starting the humidity_sensor project program");
 
-    // sensor setup
+    // Sensor Setup
+    // Sensor SDA: Connected to GP Pin 2
+    // Sensor SCL: Connected to GP Pin 3
     let p: embassy_rp::Peripherals = embassy_rp::init(Default::default());
     let sda: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_2> = p.PIN_2;
     let scl: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_3> = p.PIN_3;
+    // LCD Display Setup
+    // LCD SDA: Connected to GP Pin 16
+    // LCD SCL: Connected to GP Pin 17
     let lcd_sda: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_16> = p.PIN_16;
     let lcd_scl: embassy_rp::Peri<'_, embassy_rp::peripherals::PIN_17> = p.PIN_17;
 
