@@ -63,7 +63,7 @@ async fn main(_spawner: Spawner) -> ! {
     let lcd_i2c = i2c::I2c::new_async(p.I2C0, lcd_scl, lcd_sda, Irqs, lcd_i2c_config);
 
     // initialize variable to determine how often to get the sensor readings
-    let reading_interval_milliseconds: u64 = 1000;
+    let reading_interval_milliseconds: u64 = 5000;
 
     // check if the sensor is ready
     let ready = initialize(&mut i2c).await;
@@ -86,18 +86,28 @@ async fn main(_spawner: Spawner) -> ! {
 
         // f32 to string conversions
         let mut humidity_string = String::<16>::new();
-        let _ = core::write!(&mut humidity_string, "{}C", humidity);
         let mut temperature_string = String::<16>::new();
-        let _ = core::write!(&mut temperature_string, "{}C", temperature);
+        let _ = core::write!(&mut humidity_string, "Humid.: {:.2}%", humidity);
+        let _ = core::write!(&mut temperature_string, "Temp.: {:.2}C", temperature);
         debug!("Humidity String: {}", humidity_string.as_str());
         debug!("Temperature String: {}", temperature_string.as_str());
 
         // LCD commands
+        // First clear info from screen
         lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
         Timer::after_millis(1000).await;
+        // Write humidity reading to screen
         match lcd.write_str(&humidity_string, &mut Delay) {
             Ok(_) => debug!("Success writing to LCD Screen"),
             Err(_) => info!("Error writing humidity value to LCD screen"),
+        }
+        // Move Cursor position to Second Line to write the temperature value
+        lcd.set_cursor_pos(40, &mut Delay).expect("Failed to set cursor position");
+
+        // Write temperature reading to screen
+        match lcd.write_str(&temperature_string, &mut Delay) {
+            Ok(_) => debug!("Success writing to LCD Screen"),
+            Err(_) => info!("Error writing temperature value to LCD screen"),
         }
 
         // delay a period of time before the next reading / loop
