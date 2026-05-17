@@ -98,16 +98,16 @@ async fn main(_spawner: Spawner) -> ! {
         Timer::after_millis(1000).await;
         // Write humidity reading to screen
         match lcd.write_str(&humidity_string, &mut Delay) {
-            Ok(_) => debug!("Success writing to LCD Screen"),
-            Err(_) => info!("Error writing humidity value to LCD screen"),
+            Ok(_) => debug!("Success writing humidity string to LCD Screen"),
+            Err(_) => info!("Error writing humidity string to LCD screen"),
         }
         // Move Cursor position to Second Line to write the temperature value
         lcd.set_cursor_pos(40, &mut Delay).expect("Failed to set cursor position");
 
         // Write temperature reading to screen
         match lcd.write_str(&temperature_string, &mut Delay) {
-            Ok(_) => debug!("Success writing to LCD Screen"),
-            Err(_) => info!("Error writing temperature value to LCD screen"),
+            Ok(_) => debug!("Success writing temperature string to LCD Screen"),
+            Err(_) => info!("Error writing temperature string to LCD screen"),
         }
 
         // delay a period of time before the next reading / loop
