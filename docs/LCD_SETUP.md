@@ -45,7 +45,23 @@ let mut lcd =
    lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
    ```
 8. Write string to LCD! 
+```
+        match lcd.write_str(&humidity_string, &mut Delay) {
+            Ok(_) => debug!("Success writing to LCD Screen"),
+            Err(_) => info!("Error writing humidity value to LCD screen"),
+        }
+```
 <img width="1956" height="955" alt="IMG_0985" src="https://github.com/user-attachments/assets/9ae27e69-89ec-4e09-99c3-3f10d84bff75" />
+
+9. To write temp on the second line, first move cursor, then write string to LCD
+```
+    lcd.set_cursor_pos(40, &mut Delay).expect("Failed to set cursor position");
+        match lcd.write_str(&temperature_string, &mut Delay) {
+            Ok(_) => debug!("Success writing to LCD Screen"),
+            Err(_) => info!("Error writing temperature value to LCD screen"),
+        }
+```
+<img width="2757" height="1899" alt="IMG_0991" src="https://github.com/user-attachments/assets/4dd4592e-147e-400a-8031-c9bd561a94c6" />
 
 
 ## Resources
