@@ -16,7 +16,7 @@ Project creates a basic home humidity sensor written in Rust. The sensor ouputs 
 #### Necessary Components:
   - Raspberry Pi Pico (RP2040)
   - I2C Temperature and Humidity Sensor (DHT20)
-  - I2C LCD 1602x1 Display
+  - I2C LCD 1602 Display
   - RGB LED Strip (WS2812)
     
 #### Suggested Kit: 
