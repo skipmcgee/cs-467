@@ -7,7 +7,6 @@
 #![no_std]
 #![no_main]
 mod sensor;
-mod leds;
 mod led_strip;
 
 use defmt::*;
