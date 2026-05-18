@@ -70,7 +70,16 @@ pub fn update_leds(
 ) {
 
   let states = calc_led_states(humidity);
-  
+
+  // Main threshold conditionals. For state testing.
+  if states >= 20.0 {led1.set_high();} else {led1.set_low();}
+  if states >= 30.0 {led2.set_high();} else {led2.set_low();}
+  if states >= 40.0 {led3.set_high();} else {led3.set_low();}
+  if states >= 50.0 {led4.set_high();} else {led4.set_low();}
+  if states >= 60.0 {led5.set_high();} else {led5.set_low();}
+  if states >= 70.0 {led6.set_high();} else {led6.set_low();}
+
+  /*
   // Main threshold conditionals. The else ensures that the LEDs will turn off and not stay on forever!
   if humidity >= 20.0 {led1.set_high();} else {led1.set_low();}
   if humidity >= 30.0 {led2.set_high();} else {led2.set_low();}
@@ -78,6 +87,7 @@ pub fn update_leds(
   if humidity >= 50.0 {led4.set_high();} else {led4.set_low();}
   if humidity >= 60.0 {led5.set_high();} else {led5.set_low();}
   if humidity >= 70.0 {led6.set_high();} else {led6.set_low();}
+  */
 }
 
 // Unit test section for the LED indivdual
@@ -144,12 +154,12 @@ mod tests {
   #[test]
   // Testing where the humidity is a right under the threshold values for each interval. Expected that the coresponding LED will NOT light up just under their threshold.
   fn test_led_array_below_edge() {
-      assert_eq!(calc_led_array_states(19.9), [false, false, false, false, false, false]);
-      assert_eq!(calc_led_array_states(29.9), [true, false, false, false, false, false]);
-      assert_eq!(calc_led_array_states(39.9), [true, true, false, false, false, false]);
-      assert_eq!(calc_led_array_states(49.9), [true, true, true, false, false, false]);
-      assert_eq!(calc_led_array_states(59.9), [true, true, true, true, false, false]);
-      assert_eq!(calc_led_array_states(69.9), [true, true, true, true, true, false]);
+      assert_eq!(calc_led_states(19.9), [false, false, false, false, false, false]);
+      assert_eq!(calc_led_states(29.9), [true, false, false, false, false, false]);
+      assert_eq!(calc_led_states(39.9), [true, true, false, false, false, false]);
+      assert_eq!(calc_led_states(49.9), [true, true, true, false, false, false]);
+      assert_eq!(calc_led_states(59.9), [true, true, true, true, false, false]);
+      assert_eq!(calc_led_states(69.9), [true, true, true, true, true, false]);
   }
   
   #[test]
@@ -161,9 +171,6 @@ mod tests {
 
 
 // Unit test section for the LED strip
-#[cfg(test)]
-mod tests {
-  use super::*;
 
   // Tests with no LEDs lit up for a zero reading.
   #[test]
