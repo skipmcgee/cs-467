@@ -117,28 +117,28 @@ mod tests {
   }
   
   #[test]
-    // Testing where the humidity is at 20. Expected that the first yellow LED will light up.
+    // Testing where the humidity is at 40. Expected that the first yellow LED will light up.
   fn test_led_array_one_yellow() {
       let states = calc_led_states(40.0);
       assert_eq!(states, [true, true, true, false, false, false]);
   }
   
   #[test]
-  // Testing where the humidity is at 30. Expected that both yellow LEDs will light up.
+  // Testing where the humidity is at 50. Expected that both yellow LEDs will light up.
   fn test_led_array_both_yellow() {
       let states = calc_led_states(50.0);
       assert_eq!(states, [true, true, true, true, false, false]);
   }
   
   #[test]
-    // Testing where the humidity is at 20. Expected that the first red LED will light up.
+    // Testing where the humidity is at 60. Expected that the first red LED will light up.
   fn test_led_array_one_red() {
       let states = calc_led_states(60.0);
       assert_eq!(states, [true, true, true, true, true, false]);
   }
   
   #[test]
-  // Testing where the humidity is at 30. Expected that both red LEDs will light up.
+  // Testing where the humidity is at 70. Expected that both red LEDs will light up.
   fn test_led_array_both_red() {
       let states = calc_led_states(70.0);
       assert_eq!(states, [true, true, true, true, true, true]);
