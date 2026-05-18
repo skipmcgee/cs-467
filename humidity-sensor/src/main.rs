@@ -27,7 +27,7 @@ use hd44780_driver::HD44780;
 use heapless::String;
 use panic_probe as _;
 use sensor::{initialize, read_temperature_and_humidity};
-use leds::update_leds;
+use leds_strip::update_leds;
 
 use embassy_rp::peripherals::{DMA_CH0, PIO0};
 use embassy_rp::pio::{InterruptHandler as PioInterruptHandler, Pio};
@@ -195,7 +195,7 @@ async fn main(_spawner: Spawner) -> ! {
     */
     
     // Integrated testing for each individual LED (as part of the 6 individual LED set up, it will cycle through and every 3 seconds should light up the next one starting with no LEDs lit.
-    // Each LED represents 20% so it goes up by 10 on each threshold.    
+    // Each LED represents 10% so it goes up by 10 on each threshold.    
     loop {
         info!("Testing 0.0% - Should show 0 LEDs");
         update_leds(0.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
