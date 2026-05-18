@@ -72,12 +72,12 @@ pub fn update_leds(
   let states = calc_led_states(humidity);
 
   // Main threshold conditionals. For state testing.
-  if states >= 20.0 {led1.set_high();} else {led1.set_low();}
-  if states >= 30.0 {led2.set_high();} else {led2.set_low();}
-  if states >= 40.0 {led3.set_high();} else {led3.set_low();}
-  if states >= 50.0 {led4.set_high();} else {led4.set_low();}
-  if states >= 60.0 {led5.set_high();} else {led5.set_low();}
-  if states >= 70.0 {led6.set_high();} else {led6.set_low();}
+  if states[0] { led1.set_high(); } else { led1.set_low(); }
+  if states[1] { led2.set_high(); } else { led2.set_low(); }
+  if states[2] { led3.set_high(); } else { led3.set_low(); }
+  if states[3] { led4.set_high(); } else { led4.set_low(); }
+  if states[4] { led5.set_high(); } else { led5.set_low(); }
+  if states[5] { led6.set_high(); } else { led6.set_low(); }
 
   /*
   // Main threshold conditionals. The else ensures that the LEDs will turn off and not stay on forever!
