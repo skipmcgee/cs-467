@@ -53,6 +53,12 @@ LED 3, 4 - Yellow : 40.0 to 59.9% humidity (moderate)
 LED 5, 6 - Red : 60.0 to 100.00% humidity (moist!)
 */
 
+
+// This helper function calculates created for unit testing of the 6 LED (indivdauls). Should determine which of the 6 individual LEDs should be on.
+pub fn calc_led_states(humidity: f32) -> [bool; 6] {
+    [humidity >= 20.0, humidity >= 30.0, humidity >= 40.0, humidity >= 50.0, humidity >= 60.0, humidity >= 70.0,]
+}
+
 pub fn update_leds(
   humidity: f32,
   led1: &mut Output<'static>,
@@ -62,6 +68,18 @@ pub fn update_leds(
   led5: &mut Output<'static>,
   led6: &mut Output<'static>,
 ) {
+
+  let states = calc_led_states(humidity);
+
+  // Main threshold conditionals. For state testing.
+  if states[0] { led1.set_high(); } else { led1.set_low(); }
+  if states[1] { led2.set_high(); } else { led2.set_low(); }
+  if states[2] { led3.set_high(); } else { led3.set_low(); }
+  if states[3] { led4.set_high(); } else { led4.set_low(); }
+  if states[4] { led5.set_high(); } else { led5.set_low(); }
+  if states[5] { led6.set_high(); } else { led6.set_low(); }
+
+  /*
   // Main threshold conditionals. The else ensures that the LEDs will turn off and not stay on forever!
   if humidity >= 20.0 {led1.set_high();} else {led1.set_low();}
   if humidity >= 30.0 {led2.set_high();} else {led2.set_low();}
@@ -69,13 +87,90 @@ pub fn update_leds(
   if humidity >= 50.0 {led4.set_high();} else {led4.set_low();}
   if humidity >= 60.0 {led5.set_high();} else {led5.set_low();}
   if humidity >= 70.0 {led6.set_high();} else {led6.set_low();}
+  */
 }
 
-// Unit test section!
-
+// Unit test section for the LED indivdual
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  // Testing where the humidity is under 20. Expected that no LEDs will light up.
+  fn test_led_array_none_under_20() {
+    let states = calc_led_states(19.9);
+    assert_eq!(states, [false, false, false, false, false, false]);
+  }
+
+  #[test]
+  // Testing where the humidity is at 20. Expected that the first green LED will light up.
+  fn test_led_array_one_green() {
+      let states = calc_led_states(20.0);
+      assert_eq!(states, [true, false, false, false, false, false]);
+  }
+  
+  #[test]
+  // Testing where the humidity is at 30. Expected that both green LEDs will light up.
+  fn test_led_array_both_green() {
+      let states = calc_led_states(30.0);
+      assert_eq!(states, [true, true, false, false, false, false]);
+  }
+  
+  #[test]
+    // Testing where the humidity is at 40. Expected that the first yellow LED will light up.
+  fn test_led_array_one_yellow() {
+      let states = calc_led_states(40.0);
+      assert_eq!(states, [true, true, true, false, false, false]);
+  }
+  
+  #[test]
+  // Testing where the humidity is at 50. Expected that both yellow LEDs will light up.
+  fn test_led_array_both_yellow() {
+      let states = calc_led_states(50.0);
+      assert_eq!(states, [true, true, true, true, false, false]);
+  }
+  
+  #[test]
+    // Testing where the humidity is at 60. Expected that the first red LED will light up.
+  fn test_led_array_one_red() {
+      let states = calc_led_states(60.0);
+      assert_eq!(states, [true, true, true, true, true, false]);
+  }
+  
+  #[test]
+  // Testing where the humidity is at 70. Expected that both red LEDs will light up.
+  fn test_led_array_both_red() {
+      let states = calc_led_states(70.0);
+      assert_eq!(states, [true, true, true, true, true, true]);
+  }
+  
+  #[test]
+  // Testing where the humidity is at max (100). Expected that all LEDs will light up.
+  fn test_led_array_all_leds_on_at_100() {
+      let states = calc_led_states(100.0);
+      assert_eq!(states, [true, true, true, true, true, true]);
+  }
+  
+  #[test]
+  // Testing where the humidity is a right under the threshold values for each interval. Expected that the coresponding LED will NOT light up just under their threshold.
+  fn test_led_array_below_edge() {
+      assert_eq!(calc_led_states(19.9), [false, false, false, false, false, false]);
+      assert_eq!(calc_led_states(29.9), [true, false, false, false, false, false]);
+      assert_eq!(calc_led_states(39.9), [true, true, false, false, false, false]);
+      assert_eq!(calc_led_states(49.9), [true, true, true, false, false, false]);
+      assert_eq!(calc_led_states(59.9), [true, true, true, true, false, false]);
+      assert_eq!(calc_led_states(69.9), [true, true, true, true, true, false]);
+  }
+  
+  #[test]
+  // Testing where the humidity is a negetive value. Expected that no LEDs will light up.
+  fn test_led_array_negative() {
+      let states = calc_led_states(-5.0);
+      assert_eq!(states, [false, false, false, false, false, false]);
+  }
+
+
+// Unit test section for the LED strip
 
   // Tests with no LEDs lit up for a zero reading.
   #[test]

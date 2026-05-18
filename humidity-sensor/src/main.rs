@@ -27,7 +27,7 @@ use hd44780_driver::HD44780;
 use heapless::String;
 use panic_probe as _;
 use sensor::{initialize, read_temperature_and_humidity};
-use leds::update_leds;
+use led_strip::update_leds;
 
 use embassy_rp::peripherals::{DMA_CH0, PIO0};
 use embassy_rp::pio::{InterruptHandler as PioInterruptHandler, Pio};
@@ -38,8 +38,6 @@ use led_strip::update_strip;
 use {defmt_rtt as _, panic_probe as _};
 
 // Local imports
-mod sensor;
-use sensor::{initialize, read_temperature_and_humidity};
 
 bind_interrupts!(struct Irqs {
     I2C1_IRQ => InterruptHandler<I2C1>;
@@ -148,7 +146,8 @@ async fn main(_spawner: Spawner) -> ! {
     }
     */
 
-    // Integrated testing for each individual LED, it will cycle through and every 3 seconds should light up the next one starting with no LEDs lit.
+    /*
+    // Integrated testing for each individual LED (as part of the strip), it will cycle through and every 3 seconds should light up the next one starting with no LEDs lit.
     // Each LED represents 10% so it goes up by 10 on each threshold.
     loop {
         info!("Testing 0.0% - Should show 0 LEDs");
@@ -191,4 +190,49 @@ async fn main(_spawner: Spawner) -> ! {
         update_strip(&mut ws2812, 100.0).await;
         Timer::after_millis(3000).await;    
     }    
+    */
+    
+    // Integrated testing for each individual LED (as part of the 6 individual LED set up, it will cycle through and every 3 seconds should light up the next one starting with no LEDs lit.
+    // Each LED represents 10% so it goes up by 10 on each threshold.    
+    loop {
+        info!("Testing 0.0% - Should show 0 LEDs");
+        update_leds(0.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 19.9% - Should still show 0 LEDs");
+        update_leds(19.9, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 20.0% - Should show 1 LED");
+        update_leds(20.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 30.0% - Should show 2 LEDs");
+        update_leds(30.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 40.0% - Should show 3 LEDs");
+        update_leds(40.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 50.0% - Should show 4 LEDs");
+        update_leds(50.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 60.0% - Should show 5 LEDs");
+        update_leds(60.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 69.9% - Should still show 5 LEDs");
+        update_leds(69.9, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 70.0% - Should show all 6 LEDs");
+        update_leds(70.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    
+        info!("Testing 100.0% - Should show all 6 LEDs");
+        update_leds(100.0, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
+        Timer::after_millis(3000).await;
+    }
 }
