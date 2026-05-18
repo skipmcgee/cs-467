@@ -27,7 +27,7 @@ use hd44780_driver::HD44780;
 use heapless::String;
 use panic_probe as _;
 use sensor::{initialize, read_temperature_and_humidity};
-use leds_strip::update_leds;
+use led_strip::update_leds;
 
 use embassy_rp::peripherals::{DMA_CH0, PIO0};
 use embassy_rp::pio::{InterruptHandler as PioInterruptHandler, Pio};
@@ -38,8 +38,6 @@ use led_strip::update_strip;
 use {defmt_rtt as _, panic_probe as _};
 
 // Local imports
-mod sensor;
-use sensor::{initialize, read_temperature_and_humidity};
 
 bind_interrupts!(struct Irqs {
     I2C1_IRQ => InterruptHandler<I2C1>;
