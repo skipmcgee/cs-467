@@ -1,4 +1,4 @@
-use embassy_rp::gpio::Output;
+//use embassy_rp::gpio::Output;
 use embassy_rp::peripherals::PIO0;
 use embassy_rp::pio_programs::ws2812::PioWs2812;
 use smart_leds::RGB8;

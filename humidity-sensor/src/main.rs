@@ -69,7 +69,7 @@ async fn main(_spawner: Spawner) -> ! {
     let lcd_i2c = i2c::I2c::new_async(p.I2C0, lcd_scl, lcd_sda, Irqs, lcd_i2c_config);
 
     // initialize variable to determine how often to get the sensor readings
-    let reading_interval_milliseconds: u64 = 5000;
+    let reading_interval_milliseconds: u64 = 1000;
 
     // check if the sensor is ready
     let ready = initialize(&mut i2c).await;
@@ -82,6 +82,7 @@ async fn main(_spawner: Spawner) -> ! {
     lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
 
     // LED STRIP set up
+    // Connected D/I to GP Pin 22
     let Pio {
         mut common, sm0, ..
     } = Pio::new(p.PIO0, Irqs);
