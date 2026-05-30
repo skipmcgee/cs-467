@@ -53,6 +53,10 @@ https://a.co/d/07D1i1G4
 5.997399 [INFO ] humidity = 21.456814% (humidity_sensor humidity-sensor/src/main.rs:100)
 ```
 
+## Final Setup Diagram 
+<img width="2159" height="1634" alt="LCD _bb" src="https://github.com/user-attachments/assets/b8d5b330-f06a-4531-9d36-27f08e94d57e" />
+
+
 ## Authors 
 * skipmcgee
 * EricSoOSU
