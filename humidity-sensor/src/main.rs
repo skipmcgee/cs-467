@@ -9,36 +9,30 @@
 // Disable standard library and fn main() since we're working with an embedded system
 #![no_std]
 #![no_main]
-mod sensor;
-mod led_strip;
 
+//Import necessary libraries and macros
+use core::fmt::Write;
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
 use embassy_rp::{
     bind_interrupts,
-    gpio::{Level, Output},
     i2c::{self, Config, InterruptHandler},
-    peripherals::{I2C0, I2C1},
+    peripherals::{DMA_CH0, I2C0, I2C1, PIO0},
+    pio::{InterruptHandler as PioInterruptHandler, Pio},
+    pio_programs::ws2812::{PioWs2812, PioWs2812Program},
 };
 use embassy_time::Delay;
 use embassy_time::Timer;
 use hd44780_driver::HD44780;
 use heapless::String;
 use panic_probe as _;
-use sensor::{initialize, read_temperature_and_humidity};
-use leds::update_leds;
-
-use embassy_rp::peripherals::{DMA_CH0, PIO0};
-use embassy_rp::pio::{InterruptHandler as PioInterruptHandler, Pio};
-use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
-use led_strip::update_strip;
-
-    
 use {defmt_rtt as _, panic_probe as _};
 
 // Local imports
+mod led_strip;
 mod sensor;
+use led_strip::update_strip;
 use sensor::{initialize, read_temperature_and_humidity};
 
 bind_interrupts!(struct Irqs {
@@ -69,27 +63,13 @@ async fn main(_spawner: Spawner) -> ! {
     info!("Starting to set up sensor i2c");
     let mut i2c = i2c::I2c::new_async(p.I2C1, scl, sda, Irqs, Config::default());
 
-    // led set up - will initialize to off until the first reading is received.
-    let mut led1 = Output::new(p.PIN_10, Level::Low);
-    let mut led2 = Output::new(p.PIN_11, Level::Low);
-    let mut led3 = Output::new(p.PIN_12, Level::Low);
-    let mut led4 = Output::new(p.PIN_13, Level::Low);
-    let mut led5 = Output::new(p.PIN_14, Level::Low);
-    let mut led6 = Output::new(p.PIN_15, Level::Low);
-
-    // led STRIP set up
-    let Pio {mut common, sm0, ..} = Pio::new(p.PIO0, Irqs);
-    let program = PioWs2812Program::new(&mut common);
-    let mut ws2812 = PioWs2812::new(&mut common, sm0, p.DMA_CH0, Irqs, p.PIN_16, &program);
-
-    
     info!("Starting to set up LCD i2c");
     let mut lcd_i2c_config = Config::default();
     lcd_i2c_config.frequency = 100_000;
     let lcd_i2c = i2c::I2c::new_async(p.I2C0, lcd_scl, lcd_sda, Irqs, lcd_i2c_config);
 
     // initialize variable to determine how often to get the sensor readings
-    let reading_interval_milliseconds: u64 = 5000;
+    let reading_interval_milliseconds: u64 = 1000;
 
     // check if the sensor is ready
     let ready = initialize(&mut i2c).await;
@@ -101,9 +81,16 @@ async fn main(_spawner: Spawner) -> ! {
     lcd.reset(&mut Delay).expect("LCD Screen Reset Failed!");
     lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
 
+    // LED STRIP set up
+    // Connected D/I to GP Pin 22
+    let Pio {
+        mut common, sm0, ..
+    } = Pio::new(p.PIO0, Irqs);
+    let program = PioWs2812Program::new(&mut common);
+    let mut ws2812 = PioWs2812::new(&mut common, sm0, p.DMA_CH0, Irqs, p.PIN_22, &program);
+
     // this is the main program loop
     // consider adding exit criteria to break out when disconnected, etc?
-    /*
     loop {
         // get the temp and humidity readings from the sensor
         let (temperature, humidity) = read_temperature_and_humidity(&mut i2c).await;
@@ -111,12 +98,6 @@ async fn main(_spawner: Spawner) -> ! {
         // output the readings to the console
         info!("Temperature: {}C, Humidity: {}%", temperature, humidity);
 
-        update_leds(humidity, &mut led1, &mut led2, &mut led3, &mut led4, &mut led5, &mut led6);
-
-        // updates the WS2812 strip based on the reading
-        update_strip(&mut ws2812, humidity).await;
-        
-        // delay a period of time before the next reading
         // f32 to string conversions
         let mut humidity_string = String::<16>::new();
         let mut temperature_string = String::<16>::new();
@@ -125,17 +106,22 @@ async fn main(_spawner: Spawner) -> ! {
         debug!("Humidity String: {}", humidity_string.as_str());
         debug!("Temperature String: {}", temperature_string.as_str());
 
+        // updates the LED WS2812 strip based on the reading
+        update_strip(&mut ws2812, humidity).await;
+
         // LCD commands
         // First clear info from screen
         lcd.clear(&mut Delay).expect("LCD Screen Clear Failed!");
-        Timer::after_millis(1000).await;
+        Timer::after_millis(100).await;
+
         // Write humidity reading to screen
         match lcd.write_str(&humidity_string, &mut Delay) {
             Ok(_) => debug!("Success writing humidity string to LCD Screen"),
             Err(_) => info!("Error writing humidity string to LCD screen"),
         }
         // Move Cursor position to Second Line to write the temperature value
-        lcd.set_cursor_pos(40, &mut Delay).expect("Failed to set cursor position");
+        lcd.set_cursor_pos(40, &mut Delay)
+            .expect("Failed to set cursor position");
 
         // Write temperature reading to screen
         match lcd.write_str(&temperature_string, &mut Delay) {
@@ -146,49 +132,4 @@ async fn main(_spawner: Spawner) -> ! {
         // delay a period of time before the next reading / loop
         Timer::after_millis(reading_interval_milliseconds).await;
     }
-    */
-
-    // Integrated testing for each individual LED, it will cycle through and every 3 seconds should light up the next one starting with no LEDs lit.
-    // Each LED represents 10% so it goes up by 10 on each threshold.
-    loop {
-        info!("Testing 0.0% - Should show 0 LEDs");
-        update_strip(&mut ws2812, 0.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 10.0% - Should show 1 Green LED");
-        update_strip(&mut ws2812, 10.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 20.0% - Should show 2 Green LEDs");
-        update_strip(&mut ws2812, 20.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 30.0% - Should show 2 Green and 1 Yellow LEDs");
-        update_strip(&mut ws2812, 30.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 40.0% - Should show 2 Green and 2 Yellow LEDs");
-        update_strip(&mut ws2812, 40.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 50.0% - Should show 2 Green, 2 Yellow, and 1 OJ LEDs");
-        update_strip(&mut ws2812, 50.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 60.0% - Should show 2 Green, 2 Yellow, and 2 OJ LEDs");
-        update_strip(&mut ws2812, 60.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 70.0% - Should show 2 Green, 2 Yellow, 2 OJ , and 1 Red LEDs");
-        update_strip(&mut ws2812, 70.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 80.0% - Should show 2 Green, 2 Yellow, 2 OJ , and 2 Red LEDs");
-        update_strip(&mut ws2812, 80.0).await;
-        Timer::after_millis(3000).await;
-    
-        info!("Testing 100.0% - Should show ALL LEDs");
-        update_strip(&mut ws2812, 100.0).await;
-        Timer::after_millis(3000).await;    
-    }    
 }
