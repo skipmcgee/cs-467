@@ -63,6 +63,26 @@ let mut lcd =
 ```
 <img width="2757" height="1899" alt="IMG_0991" src="https://github.com/user-attachments/assets/4dd4592e-147e-400a-8031-c9bd561a94c6" />
 
+## Optional: Level Shifter 
+The GPIO pins on the RP2040 are tolerant to 3.3V, meaning  any higher voltage on the SDA or SCL can damage the Pico. The LCD1602, however, is designed to run at 5V. We have 2 options: 
+1. Connect to the 3.3V power, but the display will be dim.
+2. Protect the pico using a level shifter to handle the signal converison between 3.3V and 5V safely.
+
+### Circuit Diagram
+<img width="1422" height="673" alt="raspberry-pi-pico-2-lcd-1602-level-shifter" src="https://github.com/user-attachments/assets/b3aac150-4ab3-433c-811b-e4bf1c65a1d9" />
+
+### Level Shifter Close-Up
+<img width="436" height="336" alt="4 Channel (I2C or SPI) 3 3V-5V Bi-Directional Logic Level Converter" src="https://github.com/user-attachments/assets/7f9f9bbd-1235-4dce-a166-c671b6f76b3f" />
+
+### LCD With 3.3V (No Level Shifter) 
+<img width="2757" height="1899" alt="IMG_0991 2" src="https://github.com/user-attachments/assets/a0662ec6-0b9b-41a8-a744-62dcc93dcfac" />
+
+### LCD with Level Shifter
+<img width="4032" height="3024" alt="IMG_1127" src="https://github.com/user-attachments/assets/7265e8db-1bf0-4ff1-b61f-7b4c0c4e09d7" />
+
+### Setup with Level Shifter
+<img width="4284" height="5712" alt="IMG_1082 3" src="https://github.com/user-attachments/assets/c8eb7197-e9aa-4d12-bbd5-7209d401aa83" />
+
 
 ## Resources
 https://pico.implrust.com/lcd-display/hello-rust.html
